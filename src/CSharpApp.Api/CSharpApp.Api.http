@@ -7,4 +7,16 @@ Accept: application/json
 
 GET {{HostAddress}}/api/{{Version}}/getproduct/{{id}}
 Accept: application/json
+
+POST {{HostAddress}}/api/{{Version}}/createproduct
+Content-Type: application/json
+{
+    "title": "test-title-prod-1",
+    "price": 10,
+    "description": "test-descr-prod-1",
+    "categoryId": 1,
+    "images": [
+        "https://placeimg.com/640/480/any"
+    ]
+}
 ###

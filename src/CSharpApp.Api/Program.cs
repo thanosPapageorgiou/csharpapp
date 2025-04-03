@@ -1,4 +1,5 @@
 using CSharpApp.Application.Products;
+using CSharpApp.Core.Dtos;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -58,6 +59,14 @@ versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getproduct/{id:i
     return product;
 })
     .WithName("GetProduct")
+    .HasApiVersion(1.0);
+
+versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createproduct", async (IProductsService productsService, CreateProductRequest request) =>
+{
+    var newProduct = await productsService.CreateProduct(request);
+    return newProduct;
+})
+    .WithName("CreateProduct")
     .HasApiVersion(1.0);
 
 app.Run();

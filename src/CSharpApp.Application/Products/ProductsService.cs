@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 
 namespace CSharpApp.Application.Products;
 
@@ -67,6 +68,36 @@ public class ProductsService : IProductsService
         catch (Exception ex)
         {
             _logger.LogError($"Exception in ProductsService.GetProduct: {ex.Message}");
+        }
+
+        return product;
+    }
+    public async Task<Product> CreateProduct(CreateProductRequest request)
+    {
+        Product product = new();
+
+        try
+        {
+            var jsonContent = JsonSerializer.Serialize(request);
+            var contentRequest = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            string productMethod = _restApiSettings.Products;
+            var response = await _httpClient.PostAsync(productMethod, contentRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var res = JsonSerializer.Deserialize<Product>(content);
+                product = res!;
+            }
+            else
+            {
+                _logger.LogError($"Failed to Create Product, statusCode: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Exception in ProductsService.CreateProduct: {ex.Message}");
         }
 
         return product;
