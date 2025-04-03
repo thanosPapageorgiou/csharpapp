@@ -19,4 +19,16 @@ Content-Type: application/json
         "https://placeimg.com/640/480/any"
     ]
 }
+
+GET {{HostAddress}}/api/{{Version}}/getcategories
+Accept: application/json
+
+
+
+POST {{HostAddress}}/api/{{Version}}/createcategory
+Content-Type: application/json
+{
+  "name": "Books1",
+  "image": "https://api.lorem.space/image/book?w=150&h=220"
+}
 ###

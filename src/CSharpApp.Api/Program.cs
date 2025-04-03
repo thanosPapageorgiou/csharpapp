@@ -1,3 +1,4 @@
+using CSharpApp.Application.Categories;
 using CSharpApp.Application.Products;
 using CSharpApp.Core.Dtos;
 using Polly;
@@ -30,6 +31,14 @@ builder.Services.AddHttpClient<IProductsService, ProductsService>(client =>
 })
 .AddPolicyHandler(retryPolicy)
 .AddPolicyHandler(timeoutPolicy);
+
+builder.Services.AddHttpClient<ICategoriesService, CategoriesService>(client =>
+{
+    client.BaseAddress = new Uri(productApiBaseAddress);
+})
+.AddPolicyHandler(retryPolicy)
+.AddPolicyHandler(timeoutPolicy);
+
 
 
 var app = builder.Build();
@@ -68,5 +77,36 @@ versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createproduct",
 })
     .WithName("CreateProduct")
     .HasApiVersion(1.0);
+
+
+
+
+
+
+versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getcategories", async (ICategoriesService categoriesService) =>
+{
+    var products = await categoriesService.GetCategories();
+    return products;
+})
+    .WithName("GetCategories")
+    .HasApiVersion(1.0);
+
+
+versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getcategory/{id:int}", async (ICategoriesService categoriesService, int id) =>
+{
+    var category = await categoriesService.GetCategory(id);
+    return category;
+})
+    .WithName("GetCategory")
+    .HasApiVersion(1.0);
+
+versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createcategory", async (ICategoriesService categoriesService, CreateCategoryRequest request) =>
+{
+    var newCategory = await categoriesService.CreateCategory(request);
+    return newCategory;
+})
+    .WithName("CreateCategory")
+    .HasApiVersion(1.0);
+
 
 app.Run();
