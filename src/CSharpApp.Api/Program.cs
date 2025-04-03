@@ -1,3 +1,7 @@
+using CSharpApp.Application.Products;
+using Polly;
+using Polly.Extensions.Http;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
@@ -10,6 +14,22 @@ builder.Services.AddDefaultConfiguration();
 builder.Services.AddHttpConfiguration();
 builder.Services.AddProblemDetails();
 builder.Services.AddApiVersioning();
+
+string productApiBaseAddress = builder.Configuration.GetValue<string>("RestApiSettings:BaseUrl") ?? string.Empty;
+
+var retryPolicy = HttpPolicyExtensions.HandleTransientHttpError()
+    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+    .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(12));
+
+builder.Services.AddHttpClient<IProductsService, ProductsService>(client =>
+{
+    client.BaseAddress = new Uri(productApiBaseAddress);
+})
+.AddPolicyHandler(retryPolicy)
+.AddPolicyHandler(timeoutPolicy);
+
 
 var app = builder.Build();
 
