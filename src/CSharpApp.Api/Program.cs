@@ -51,4 +51,13 @@ versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getproducts", as
     .WithName("GetProducts")
     .HasApiVersion(1.0);
 
+
+versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getproduct/{id:int}", async (IProductsService productsService, int id) =>
+{
+    var product = await productsService.GetProduct(id);
+    return product;
+})
+    .WithName("GetProduct")
+    .HasApiVersion(1.0);
+
 app.Run();

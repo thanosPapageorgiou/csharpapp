@@ -4,4 +4,7 @@
 GET {{HostAddress}}/api/{{Version}}/getproducts
 Accept: application/json
 
+
+GET {{HostAddress}}/api/{{Version}}/getproduct/{{id}}
+Accept: application/json
 ###
