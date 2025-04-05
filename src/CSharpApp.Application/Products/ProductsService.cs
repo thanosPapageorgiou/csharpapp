@@ -1,3 +1,4 @@
+using CSharpApp.Application.Validation;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -74,6 +75,19 @@ public class ProductsService : IProductsService
     }
     public async Task<Product> CreateProduct(CreateProductRequest request)
     {
+        var validator = new CreateProductRequestValidator();
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            foreach (var failure in validationResult.Errors)
+            {
+                _logger.LogError($"Validation failed: {failure.ErrorMessage}");
+            }
+
+            throw new ArgumentException("You passed in an invalid parameter!", "Title");
+        }
+
         Product product = new();
 
         try

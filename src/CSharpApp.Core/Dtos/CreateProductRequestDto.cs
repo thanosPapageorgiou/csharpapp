@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CSharpApp.Core.Dtos;
 
 public sealed class CreateProductRequest
@@ -12,7 +14,7 @@ public sealed class CreateProductRequest
     public string? Description { get; set; }
 
     [JsonPropertyName("images")]
-    public List<string> Images { get; } = [];
+    public List<string> Images { get; set; } = [];
 
     [JsonPropertyName("categoryId")]
     public int CategoryId { get; set; }
