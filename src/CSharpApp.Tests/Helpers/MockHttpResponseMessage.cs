@@ -8,16 +8,16 @@ namespace CSharpApp.Tests.Helpers
 {
     class MockHttpResponseMessage: HttpMessageHandler
     {
-        private readonly HttpResponseMessage _testResponse;
+        private readonly HttpResponseMessage _mockResponse;
 
-        public MockHttpResponseMessage(HttpResponseMessage fakeResponse)
+        public MockHttpResponseMessage(HttpResponseMessage mockResponse)
         {
-            _testResponse = fakeResponse;
+            _mockResponse = mockResponse;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_testResponse);
+            return Task.FromResult(_mockResponse);
         }
     }
 }

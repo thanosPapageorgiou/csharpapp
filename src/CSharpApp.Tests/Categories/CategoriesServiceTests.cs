@@ -8,14 +8,17 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace CSharpApp.Tests.Categories
 {
     public class CategoriesServiceTests
     {
-        #region GetCategories_test
-        [Fact]
-        public async void GetCategories_test()
+        #region GetCategories Should Return Records
+        [Theory]
+        [InlineData(3)]
+        [InlineData(0)]
+        public async void GetCategories_ShouldReturnRecords(int expected)
         {
             //Arrange
             var mockCategories = new List<Category>
@@ -35,21 +38,20 @@ namespace CSharpApp.Tests.Categories
             //Act
             var actual = await service.GetCategories();
 
-            var imageCounter = actual.Select(s => s.Image.Equals("")).Count();
 
-          Assert.True(actual.Count() == 3);
+            Assert.Equal(expected, actual.Count);
         }
         #endregion
 
-        #region GetSinglemockCategory_test
+        #region GetSingCategory Different CategoryID Should Fail
         [Theory]
-        [InlineData(1)] 
-        [InlineData(2)]  
-        [InlineData(3)] 
-        public async void GetSingleCategory_test(int categoryId)
+        [InlineData(1, 1)] 
+        [InlineData(2, 100)]  
+        [InlineData(3, 3)] 
+        public async void GetSingleCategory_Diff_CategoryID_ShouldFail(int categoryId, int expected)
         {
             //Arrange
-            var mockCategory = new Category { Id = categoryId, Name = "Test Category " + categoryId };
+            var mockCategory = new Category { Id = categoryId, Name = $"Test Category { categoryId }" };
 
             var json = JsonSerializer.Serialize(mockCategory);
             var httpClient = MockHttpClientFactory.CreateHttpClient(json);
@@ -59,20 +61,19 @@ namespace CSharpApp.Tests.Categories
 
             var service = new CategoriesService(httpClient, settings, logger);
 
-
             //Act
             var actual = await service.GetCategory(categoryId);
 
             //Assert
-            Assert.Equal(categoryId, actual.Id);
+            Assert.Equal(expected, actual.Id);
         }
         #endregion
 
-        #region CreateCategory_test
+        #region CreateCategory If Return Different Record Should Be Fail
         [Theory]
-        [InlineData("test-title-category-1", "https://placeimg.com/640/480/any")]
-        [InlineData("test-title-category-2", "https://placeimg.com/640/480/another")]
-        public async void CreateProduct_test(string name, string image)
+        [InlineData("test-title-category-1", "https://placeimg.com/640/480/any", "test-title-category-1")]
+        [InlineData("test-title-category-2", "https://placeimg.com/640/480/another", "test-title-category-100")]
+        public async void CreateCategory_Return_Diff_Record_ShouldFail(string name, string image, string expected)
         {
             //Arrange
             Random random = new();
@@ -103,7 +104,46 @@ namespace CSharpApp.Tests.Categories
 
             //Assert
             Assert.True(actual != null);
-            Assert.Equal(name, actual.Name);
+            Assert.Equal(expected, actual.Name);
+        }
+        #endregion
+
+        #region CreateCategory If Has Empty -Name OR Image- Parameter Should Throw ArgumentException
+        [Theory]
+        [InlineData("", "https://placeimg.com/640/480/any")]
+        [InlineData("test-title-category-2", "")]
+        public async void CreateProduct_Empty_Parameter_Should_ThrowArgumentException(string name, string image)
+        {
+            //Arrange
+            Random random = new();
+            var mockCategory = new Category
+            {
+                Id = random.Next(),
+                Name = name,
+                Image = image,
+                CreationAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            var json = JsonSerializer.Serialize(mockCategory);
+            var httpClient = MockHttpClientFactory.CreateHttpClient(json);
+
+            var settings = Options.Create(new RestApiSettings { Products = "categories" });
+            var logger = new LoggerFactory().CreateLogger<CategoriesService>();
+
+            var service = new CategoriesService(httpClient, settings, logger);
+
+
+            //Act
+            var newCategoryRequest = new CreateCategoryRequest
+            {
+                Name = name,
+                Image = image
+            };
+
+            //Assert
+            var prop = name == string.Empty ? "name" : "image";
+            await Assert.ThrowsAsync<ArgumentException>(prop, async () => await service.CreateCategory(newCategoryRequest));
         }
         #endregion
     }

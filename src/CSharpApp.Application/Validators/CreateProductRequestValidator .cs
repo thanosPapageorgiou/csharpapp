@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSharpApp.Application.Constants;
 
 namespace CSharpApp.Application.Validation
 {
@@ -12,17 +13,17 @@ namespace CSharpApp.Application.Validation
         public CreateProductRequestValidator()
         {
             RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title is required")
-                .Length(1, 100).WithMessage("Title must be between 1 and 100 characters");
+                .NotEmpty().WithMessage(ValidationMessages.ProductTitleRequired)
+                .Length(10, 100).WithMessage(ValidationMessages.ProductTitleMustBeGreaterThan10);
 
             RuleFor(x => x.Price)
-                .GreaterThan(0).WithMessage("Price must be greater than zero");
+                .GreaterThan(0).WithMessage(ValidationMessages.ProductPriceMustBePositiveNumber);
 
             RuleFor(x => x.CategoryId)
-                .GreaterThan(0).WithMessage("CategoryId must be a valid positive number");
+                .GreaterThan(0).WithMessage(ValidationMessages.ProductCategoryIdMustBePositiveNumber);
 
             RuleFor(x => x.Images)
-                .NotEmpty().WithMessage("At least one image URL is required");
+                .NotEmpty().WithMessage(ValidationMessages.ProductImageURLRequired);
         }
     }
 }

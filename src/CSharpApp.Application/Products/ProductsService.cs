@@ -1,4 +1,6 @@
+using CSharpApp.Application.Constants;
 using CSharpApp.Application.Validation;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -8,17 +10,22 @@ namespace CSharpApp.Application.Products;
 
 public class ProductsService : IProductsService
 {
+    #region Properties
     private readonly HttpClient _httpClient;
     private readonly RestApiSettings _restApiSettings;
     private readonly ILogger<ProductsService> _logger;
+    #endregion
 
+    #region Constructor
     public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger)
     {
         _httpClient = httpClient;
         _restApiSettings = restApiSettings.Value;
         _logger = logger;
     }
+    #endregion
 
+    #region Public Methods
     public async Task<IReadOnlyCollection<Product>> GetProducts()
     {
         IReadOnlyCollection<Product> products = new List<Product>().AsReadOnly();
@@ -75,18 +82,7 @@ public class ProductsService : IProductsService
     }
     public async Task<Product> CreateProduct(CreateProductRequest request)
     {
-        var validator = new CreateProductRequestValidator();
-        var validationResult = await validator.ValidateAsync(request);
-
-        if (!validationResult.IsValid)
-        {
-            foreach (var failure in validationResult.Errors)
-            {
-                _logger.LogError($"Validation failed: {failure.ErrorMessage}");
-            }
-
-            throw new ArgumentException("You passed in an invalid parameter!", "Title");
-        }
+        await CreateProductValidation(request);
 
         Product product = new();
 
@@ -116,4 +112,26 @@ public class ProductsService : IProductsService
 
         return product;
     }
+    #endregion
+
+    #region Private Methods
+    private async Task CreateProductValidation(CreateProductRequest request)
+    {
+        var validator = new CreateProductRequestValidator();
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            foreach (var failure in validationResult.Errors)
+            {
+                if(failure.PropertyName.ToLower() == Properties.Title)
+                {
+                    throw new ArgumentException(ExceptionMessages.GeneralArgumentException, failure.PropertyName.ToLower());
+                }
+
+                _logger.LogError($" {LoggerMessages.LoggerValidationFail} {failure.ErrorMessage}");
+            }
+        }
+    }
+    #endregion
 }
