@@ -3,7 +3,6 @@ using CSharpApp.Core.Dtos;
 using CSharpApp.Core.Interfaces;
 using CSharpApp.Core.Settings;
 using CSharpApp.Tests.Helpers;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

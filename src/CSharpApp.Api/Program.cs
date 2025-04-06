@@ -1,3 +1,5 @@
+using Autofac.Core;
+using CSharpApp.Application.Authentication;
 using CSharpApp.Application.Categories;
 using CSharpApp.Application.Products;
 using CSharpApp.Core.Dtos;
@@ -52,12 +54,17 @@ builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
 .AddPolicyHandler(timeoutPolicy);
 
 
-//string redis = builder.Configuration.GetValue<string>("RestApiSettings:Redis") ?? string.Empty;
-//builder.Services.AddStackExchangeRedisCache(options =>
-//{
-//    options.Configuration = builder.Configuration.GetConnectionString(redis);
-//    options.InstanceName = "Token_";
-//});
+builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(120);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpContextAccessor();
+
+
+builder.Services.AddTransient<ITokenService, TokenService>();
 
 var app = builder.Build();
 
@@ -67,6 +74,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseSession();
 app.UseHttpsRedirection();
 
 var versionedEndpointRouteBuilder = app.NewVersionedApi();

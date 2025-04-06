@@ -1,7 +1,6 @@
 using CSharpApp.Application.Constants;
 using CSharpApp.Application.Validation;
 using MediatR;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -38,6 +37,7 @@ public class ProductsService : IProductsService
 
         try
         {
+            
             var accessToken = await _authService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             

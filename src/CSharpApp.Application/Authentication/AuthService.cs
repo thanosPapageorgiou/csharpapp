@@ -15,14 +15,16 @@ public class AuthService : IAuthService
     private readonly HttpClient _httpClient;
     private readonly RestApiSettings _restApiSettings;
     private readonly ILogger<CategoriesService> _logger;
+    private readonly ITokenService _tokenService;
     #endregion
 
     #region Constructor
-    public AuthService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<CategoriesService> logger)
+    public AuthService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<CategoriesService> logger, ITokenService tokenService)
     {
         _httpClient = httpClient;
         _restApiSettings = restApiSettings.Value;
         _logger = logger;
+        _tokenService = tokenService;
     }
     #endregion
 
@@ -31,8 +33,8 @@ public class AuthService : IAuthService
     {
         string accessToken = string.Empty;
 
-        string _AccessTokenCache = "";
-        string _RefreshTokenCache = "";
+        string _AccessTokenCache = _tokenService.GetAccessToken();
+        
 
         if (!string.IsNullOrEmpty(_AccessTokenCache))
         {
@@ -43,22 +45,27 @@ public class AuthService : IAuthService
             }
             else
             {
-                if(!string.IsNullOrEmpty(_RefreshTokenCache))
+                string _RefreshTokenCache = _tokenService.GetRefreshToken();
+                if (!string.IsNullOrEmpty(_RefreshTokenCache))
                 {
-                    AuthTokens Tokens = await RefreshExistingToken(_RefreshTokenCache!);
-                    if (!string.IsNullOrEmpty(Tokens.AccessToken))
+                    AuthTokens tokens = await RefreshExistingToken(_RefreshTokenCache!);
+                    if (!string.IsNullOrEmpty(tokens.AccessToken))
                     {
-                        accessToken = Tokens.AccessToken;
+                        accessToken = tokens.AccessToken;
+
+                        _tokenService.StoreToken(tokens.AccessToken, tokens.RefreshToken!);
                     }
                 }
             }
         }
         else
         {
-            AuthTokens Tokens = await GenerateToken();
-            if (!string.IsNullOrEmpty(Tokens.AccessToken))
+            AuthTokens tokens = await GenerateToken();
+            if (!string.IsNullOrEmpty(tokens.AccessToken))
             {
-                accessToken = Tokens.AccessToken;
+                accessToken = tokens.AccessToken;
+
+                _tokenService.StoreToken(tokens.AccessToken, tokens.RefreshToken!);
             }
         }
         return accessToken;

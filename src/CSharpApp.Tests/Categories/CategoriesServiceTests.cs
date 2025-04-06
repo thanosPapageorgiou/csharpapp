@@ -4,7 +4,6 @@ using CSharpApp.Core.Dtos;
 using CSharpApp.Core.Interfaces;
 using CSharpApp.Core.Settings;
 using CSharpApp.Tests.Helpers;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -99,7 +98,7 @@ namespace CSharpApp.Tests.Categories
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
             var authService = new Mock<IAuthService>();
-            var cacheMock = new Mock<IDistributedCache>();
+            //var cacheMock = new Mock<IDistributedCache>();
 
             var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
