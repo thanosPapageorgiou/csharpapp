@@ -3,6 +3,7 @@ using CSharpApp.Application.Validation;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace CSharpApp.Application.Categories;
@@ -13,14 +14,16 @@ public class CategoriesService : ICategoriesService
     private readonly HttpClient _httpClient;
     private readonly RestApiSettings _restApiSettings;
     private readonly ILogger<CategoriesService> _logger;
+    private readonly IAuthService _authService;
     #endregion
 
     #region Constructor
-    public CategoriesService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<CategoriesService> logger)
+    public CategoriesService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<CategoriesService> logger, IAuthService authService)
     {
         _httpClient = httpClient;
         _restApiSettings = restApiSettings.Value;
         _logger = logger;
+        _authService = authService;
     }
     #endregion
 
@@ -31,6 +34,9 @@ public class CategoriesService : ICategoriesService
 
         try
         {
+            var accessToken = await _authService.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
             string categoryMethod = _restApiSettings.Categories ?? string.Empty;
             var response = await _httpClient.GetAsync(categoryMethod);
 
@@ -58,6 +64,9 @@ public class CategoriesService : ICategoriesService
 
         try
         {
+            var accessToken = await _authService.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
             string categoryMethod = _restApiSettings.Categories + "/" + (id.ToString() ?? string.Empty);
             var response = await _httpClient.GetAsync(categoryMethod);
 
@@ -87,6 +96,9 @@ public class CategoriesService : ICategoriesService
 
         try
         {
+            var accessToken = await _authService.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
             var jsonContent = JsonSerializer.Serialize(request);
             var contentRequest = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 

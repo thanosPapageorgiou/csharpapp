@@ -1,9 +1,12 @@
 using CSharpApp.Application.Constants;
 using CSharpApp.Application.Validation;
 using MediatR;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace CSharpApp.Application.Products;
@@ -14,14 +17,17 @@ public class ProductsService : IProductsService
     private readonly HttpClient _httpClient;
     private readonly RestApiSettings _restApiSettings;
     private readonly ILogger<ProductsService> _logger;
+    private readonly IAuthService _authService;
+    
     #endregion
 
     #region Constructor
-    public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger)
+    public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger, IAuthService authService)
     {
         _httpClient = httpClient;
         _restApiSettings = restApiSettings.Value;
         _logger = logger;
+        _authService = authService;
     }
     #endregion
 
@@ -32,6 +38,9 @@ public class ProductsService : IProductsService
 
         try
         {
+            var accessToken = await _authService.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            
             string productMethod = _restApiSettings.Products ?? string.Empty;
             var response = await _httpClient.GetAsync(productMethod);
 
@@ -59,6 +68,9 @@ public class ProductsService : IProductsService
 
         try
         {
+            var accessToken = await _authService.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
             string productMethod = _restApiSettings.Products + "/" + (id.ToString() ?? string.Empty);
             var response = await _httpClient.GetAsync(productMethod);
 
@@ -88,6 +100,9 @@ public class ProductsService : IProductsService
 
         try
         {
+            var accessToken = await _authService.GetToken();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
             var jsonContent = JsonSerializer.Serialize(request);
             var contentRequest = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 

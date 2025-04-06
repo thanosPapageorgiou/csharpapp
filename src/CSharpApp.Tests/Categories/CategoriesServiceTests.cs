@@ -1,10 +1,13 @@
 using CSharpApp.Application.Categories;
 using CSharpApp.Application.Products;
 using CSharpApp.Core.Dtos;
+using CSharpApp.Core.Interfaces;
 using CSharpApp.Core.Settings;
 using CSharpApp.Tests.Helpers;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -32,8 +35,12 @@ namespace CSharpApp.Tests.Categories
 
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
+            //var cacheMock = new Mock<IDistributedCache>();
+            var authService = new Mock<IAuthService>();
 
-            var service = new CategoriesService(httpClient, settings, logger);
+     
+
+            var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
             //Act
             var actual = await service.GetCategories();
@@ -58,8 +65,9 @@ namespace CSharpApp.Tests.Categories
 
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
+            var authService = new Mock<IAuthService>();
 
-            var service = new CategoriesService(httpClient, settings, logger);
+            var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
             //Act
             var actual = await service.GetCategory(categoryId);
@@ -90,8 +98,10 @@ namespace CSharpApp.Tests.Categories
 
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
+            var authService = new Mock<IAuthService>();
+            var cacheMock = new Mock<IDistributedCache>();
 
-            var service = new CategoriesService(httpClient, settings, logger);
+            var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
 
             //Act
@@ -130,8 +140,9 @@ namespace CSharpApp.Tests.Categories
 
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
+            var authService = new Mock<IAuthService>();
 
-            var service = new CategoriesService(httpClient, settings, logger);
+            var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
 
             //Act

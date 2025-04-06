@@ -1,9 +1,12 @@
 using CSharpApp.Application.Products;
 using CSharpApp.Core.Dtos;
+using CSharpApp.Core.Interfaces;
 using CSharpApp.Core.Settings;
 using CSharpApp.Tests.Helpers;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -28,8 +31,10 @@ namespace CSharpApp.Tests.Products
 
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
+            var authService = new Mock<IAuthService>();
+            //var cacheMock = new Mock<IDistributedCache>();
 
-            var service = new ProductsService(httpClient, settings, logger);
+            var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
             //Act
             var actual = await service.GetProducts();
@@ -54,8 +59,10 @@ namespace CSharpApp.Tests.Products
 
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
+            var authService = new Mock<IAuthService>();
+            //var cacheMock = new Mock<IDistributedCache>();
 
-            var service = new ProductsService(httpClient, settings, logger);
+            var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
             //Act
             var actual = await service.GetProduct(productId);
@@ -89,8 +96,10 @@ namespace CSharpApp.Tests.Products
 
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
+            var authService = new Mock<IAuthService>();
+            //var cacheMock = new Mock<IDistributedCache>();
 
-            var service = new ProductsService(httpClient, settings, logger);
+            var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
 
             //Act
@@ -135,8 +144,10 @@ namespace CSharpApp.Tests.Products
 
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
+            var authService = new Mock<IAuthService>();
+            //var cacheMock = new Mock<IDistributedCache>();
 
-            var service = new ProductsService(httpClient, settings, logger);
+            var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
 
             //Act

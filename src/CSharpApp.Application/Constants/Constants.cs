@@ -18,6 +18,9 @@ namespace CSharpApp.Application.Constants
         public const string ProductTitleMustBeGreaterThan10 = "Title must be between 10 and 100 characters.";
         public const string ProductCategoryIdMustBePositiveNumber = "CategoryId must be a valid positive number.";
         public const string ProductImageURLRequired = "At least one image URL is required.";
+
+        public const string UserNameRequired = "UserName is required";
+        public const string PassWordRequired = "Password is required";
     }
     public static class LoggerMessages
     {

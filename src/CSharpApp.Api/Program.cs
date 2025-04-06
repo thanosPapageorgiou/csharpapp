@@ -1,8 +1,13 @@
 using CSharpApp.Application.Categories;
 using CSharpApp.Application.Products;
 using CSharpApp.Core.Dtos;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.IdentityModel.Tokens;
 using Polly;
 using Polly.Extensions.Http;
+using System.ComponentModel.Design;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +44,20 @@ builder.Services.AddHttpClient<ICategoriesService, CategoriesService>(client =>
 .AddPolicyHandler(retryPolicy)
 .AddPolicyHandler(timeoutPolicy);
 
+builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
+{
+    client.BaseAddress = new Uri(productApiBaseAddress);
+})
+.AddPolicyHandler(retryPolicy)
+.AddPolicyHandler(timeoutPolicy);
 
+
+//string redis = builder.Configuration.GetValue<string>("RestApiSettings:Redis") ?? string.Empty;
+//builder.Services.AddStackExchangeRedisCache(options =>
+//{
+//    options.Configuration = builder.Configuration.GetConnectionString(redis);
+//    options.InstanceName = "Token_";
+//});
 
 var app = builder.Build();
 
@@ -49,9 +67,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 var versionedEndpointRouteBuilder = app.NewVersionedApi();
+
 
 versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getproducts", async (IProductsService productsService) =>
     {
@@ -77,6 +96,8 @@ versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createproduct",
 })
     .WithName("CreateProduct")
     .HasApiVersion(1.0);
+
+
 
 
 
