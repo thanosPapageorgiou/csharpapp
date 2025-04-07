@@ -1,4 +1,5 @@
 using CSharpApp.Api.Extensions;
+using CSharpApp.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +18,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<PerformanceMiddleware>();
 app.UseSession();
 app.UseHttpsRedirection();
-//app.UseRequestPerformanceLogging();
 
 // Register Endpoints
 app.MapProjectEndpoints();

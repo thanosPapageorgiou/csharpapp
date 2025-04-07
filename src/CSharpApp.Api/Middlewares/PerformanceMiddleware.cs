@@ -13,15 +13,15 @@ namespace CSharpApp.Api.Middlewares
             _logger = logger;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
 
             await _next(context);
 
-            stopwatch.Stop();
+            watch.Stop();
 
-            var elapsedMs = stopwatch.ElapsedMilliseconds;
+            var elapsedMs = watch.ElapsedMilliseconds;
             var requestPath = context.Request.Path;
 
             _logger.LogInformation("Request [{RequestPath}] executed in {ElapsedMilliseconds}ms", requestPath, elapsedMs);
