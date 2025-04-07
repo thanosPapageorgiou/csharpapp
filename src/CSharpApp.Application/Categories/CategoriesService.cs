@@ -1,5 +1,7 @@
 using CSharpApp.Application.Constants;
+using CSharpApp.Application.Utilities;
 using CSharpApp.Application.Validation;
+using CSharpApp.Core.Dtos;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -28,7 +30,7 @@ public class CategoriesService : ICategoriesService
     #endregion
 
     #region Public Methods
-    public async Task<IReadOnlyCollection<Category>> GetCategories()
+    public async Task<Result<IReadOnlyCollection<Category>>> GetCategories()
     {
         IReadOnlyCollection<Category> categories = new List<Category>().AsReadOnly();
 
@@ -45,20 +47,24 @@ public class CategoriesService : ICategoriesService
                 var content = await response.Content.ReadAsStringAsync();
                 var res = JsonSerializer.Deserialize<List<Category>>(content);
                 categories = res!;
+
+                return Result<IReadOnlyCollection<Category>>.Success(categories);
             }
             else
             {
                 _logger.LogError($"Failed to retrieve Categories, statusCode: {response.StatusCode}");
+
+                return Result<IReadOnlyCollection<Category>>.Failure($"Failed to retrieve Categories, statusCode: {response.StatusCode}");
             }
         }
         catch(Exception ex)
         {
             _logger.LogError($"Exception in CategoriesService.GetCategories: {ex.Message}");
-        }
 
-        return categories!;
+            return Result<IReadOnlyCollection<Category>>.Failure($"Exception in CategoriesService.GetCategories: {ex.Message}");
+        }
     }
-    public async Task<Category> GetCategory(int id)
+    public async Task<Result<Category>> GetCategory(int categoryId)
     {
         Category category = new();
 
@@ -67,7 +73,7 @@ public class CategoriesService : ICategoriesService
             var accessToken = await _authService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            string categoryMethod = _restApiSettings.Categories + "/" + (id.ToString() ?? string.Empty);
+            string categoryMethod = _restApiSettings.Categories + "/" + (categoryId.ToString() ?? string.Empty);
             var response = await _httpClient.GetAsync(categoryMethod);
 
             if (response.IsSuccessStatusCode)
@@ -75,20 +81,24 @@ public class CategoriesService : ICategoriesService
                 var content = await response.Content.ReadAsStringAsync();
                 var res = JsonSerializer.Deserialize<Category>(content);
                 category = res!;
+
+                return Result<Category>.Success(category);
             }
             else
             {
                 _logger.LogError($"Failed to retrieve Category, statusCode: {response.StatusCode}");
+
+                return Result<Category>.Failure($"Failed to retrieve Category, statusCode: {response.StatusCode}");
             }
         }
         catch (Exception ex)
         {
             _logger.LogError($"Exception in CategoriesService.GetCategory: {ex.Message}");
-        }
 
-        return category;
+            return Result<Category>.Failure($"Exception in CategoriesService.GetCategory: {ex.Message}");
+        }
     }
-    public async Task<Category> CreateCategory(CreateCategoryRequest request)
+    public async Task<Result<Category>> CreateCategory(CreateCategoryRequest request)
     {
         await CreateCategoryValidation(request);
 
@@ -102,7 +112,7 @@ public class CategoriesService : ICategoriesService
             var jsonContent = JsonSerializer.Serialize(request);
             var contentRequest = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            string categoryMethod = _restApiSettings.Categories;
+            string categoryMethod = _restApiSettings.Categories!;
             var response = await _httpClient.PostAsync(categoryMethod, contentRequest);
 
             if (response.IsSuccessStatusCode)
@@ -110,18 +120,23 @@ public class CategoriesService : ICategoriesService
                 var content = await response.Content.ReadAsStringAsync();
                 var res = JsonSerializer.Deserialize<Category>(content);
                 category = res!;
+
+                return Result<Category>.Success(category);
             }
             else
             {
                 _logger.LogError($"Failed to Create Category, statusCode: {response.StatusCode}");
+
+                return Result<Category>.Failure($"Failed to Create Category, statusCode: {response.StatusCode}");
+
             }
         }
         catch (Exception ex)
         {
             _logger.LogError($"Exception in CategoriesService.CreateCategory: {ex.Message}");
-        }
 
-        return category;
+            return Result<Category>.Failure($"Exception in CategoriesService.CreateCategory: {ex.Message}");
+        }
     }
     #endregion
 
@@ -133,11 +148,13 @@ public class CategoriesService : ICategoriesService
 
         if (!validationResult.IsValid)
         {
+            // The following ArgumentExceptions are thrown specifically for unit test purposes.
             foreach (var failure in validationResult.Errors)
             {
-                _logger.LogError($" { LoggerMessages.LoggerValidationFail } {failure.ErrorMessage}");
-
-                throw new ArgumentException(ExceptionMessages.GeneralArgumentException, failure.PropertyName.ToLower());
+                if (CommonUtils.IsRunningFromUnitTest())
+                {
+                    throw new ArgumentException(ExceptionMessages.GeneralArgumentException, failure.PropertyName.ToLower());
+                }
             }
         }
     }

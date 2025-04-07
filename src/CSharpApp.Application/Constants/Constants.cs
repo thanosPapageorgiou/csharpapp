@@ -35,4 +35,8 @@ namespace CSharpApp.Application.Constants
     {
         public const string Title = "title";
     }
+    //public static class LogMessages
+    //{
+    //    public const string Title = "title";
+    //}
 }

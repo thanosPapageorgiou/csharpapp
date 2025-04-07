@@ -11,20 +11,24 @@ namespace CSharpApp.Application.Authentication
 {
     public class TokenService : ITokenService
     {
+        #region Properties
         private readonly IHttpContextAccessor _httpContextAccessor;
+        #endregion
 
+        #region Constructor
         public TokenService(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
+        #endregion
 
+        #region public Methods
         public void StoreToken(string accessToken, string refreshToken)
         {
             var session =  _httpContextAccessor.HttpContext.Session;
             session.Set("AccessToken", ConversionUtils.ConvertToByte(accessToken));
             session.Set("RefreshToken", ConversionUtils.ConvertToByte(refreshToken));
         }
-
         public string GetAccessToken()
         {
             var session = _httpContextAccessor.HttpContext.Session;
@@ -32,19 +36,18 @@ namespace CSharpApp.Application.Authentication
             session.TryGetValue("AccessToken", out byte[] value);
             return ConversionUtils.ConvertToString(value);
         }
-
         public string GetRefreshToken()
         {
             var session = _httpContextAccessor.HttpContext.Session;
             session.TryGetValue("RefreshToken", out byte[] value);
             return ConversionUtils.ConvertToString(value);
         }
-
         public void RemoveToken()
         {
             var session = _httpContextAccessor.HttpContext.Session;
             session.Remove("AccessToken");
             session.Remove("RefreshToken");
         }
+        #endregion
     }
 }

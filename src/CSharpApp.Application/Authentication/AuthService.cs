@@ -28,13 +28,12 @@ public class AuthService : IAuthService
     }
     #endregion
 
-    #region Private Methods
+    #region public Methods
     public async Task<string> GetToken()
     {
         string accessToken = string.Empty;
 
         string _AccessTokenCache = _tokenService.GetAccessToken();
-        
 
         if (!string.IsNullOrEmpty(_AccessTokenCache))
         {
@@ -79,7 +78,7 @@ public class AuthService : IAuthService
 
         try
         {
-            User user = new User
+            AuthUser user = new AuthUser
             {
                 Email = _restApiSettings.Username,
                 PassWord = _restApiSettings.Password
@@ -142,12 +141,13 @@ public class AuthService : IAuthService
     {
         AuthTokens tokens = new();
 
-        User user = new User
+        AuthUser user = new AuthUser
         {
             Email = _restApiSettings.Username,
             PassWord = _restApiSettings.Password
         };
-        //here goes the web api call to generate new Token by refresh Token.
+        // This method execute a web API call to request a new accessToken using the refreshToken. 
+        // Send the refreshToken form Session to the authorization server, returns a new accessToken.
 
         return tokens!;
     }

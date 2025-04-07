@@ -45,7 +45,7 @@ namespace CSharpApp.Tests.Categories
             var actual = await service.GetCategories();
 
 
-            Assert.Equal(expected, actual.Count);
+            Assert.Equal(expected, actual.Data.Count);
         }
         #endregion
 
@@ -72,7 +72,7 @@ namespace CSharpApp.Tests.Categories
             var actual = await service.GetCategory(categoryId);
 
             //Assert
-            Assert.Equal(expected, actual.Id);
+            Assert.Equal(expected, actual.Data.Id);
         }
         #endregion
 
@@ -113,7 +113,7 @@ namespace CSharpApp.Tests.Categories
 
             //Assert
             Assert.True(actual != null);
-            Assert.Equal(expected, actual.Name);
+            Assert.Equal(expected, actual.Data.Name);
         }
         #endregion
 

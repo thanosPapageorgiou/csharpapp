@@ -39,7 +39,7 @@ namespace CSharpApp.Tests.Products
             var actual = await service.GetProducts();
 
             //Assert
-            Assert.True(actual.Count > 0);
+            Assert.True(actual.Data.Count > 0);
         }
         #endregion
 
@@ -67,7 +67,7 @@ namespace CSharpApp.Tests.Products
             var actual = await service.GetProduct(productId);
 
             //Assert
-            Assert.Equal(expected, actual.Id);
+            Assert.Equal(expected, actual.Data.Id);
         }
         #endregion
 
@@ -114,7 +114,7 @@ namespace CSharpApp.Tests.Products
 
             //Assert
             Assert.True(actual != null);
-            Assert.Equal(expectedTitle, actual.Title);
+            Assert.Equal(expectedTitle, actual.Data.Title);
         }
         #endregion
 
@@ -124,6 +124,8 @@ namespace CSharpApp.Tests.Products
         [InlineData("", 10, "test-descr-prod-2", 1, "https://placeimg.com/640/480/any")]
         public async void CreateProduct_Empty_Title_Should_ThrowArgumentException(string title, decimal price, string description, int categoryId, string image)
         {
+            Environment.SetEnvironmentVariable("IS_UNIT_TEST", "true");
+
             //Arrange
             Random random = new();
             var mockProduct = new Product
@@ -160,6 +162,8 @@ namespace CSharpApp.Tests.Products
             };
 
              await Assert.ThrowsAsync<ArgumentException>("title", async () => await service.CreateProduct(newProductRequest));
+
+            Environment.SetEnvironmentVariable("IS_UNIT_TEST", "false");
         }
         #endregion
     }

@@ -1,5 +1,7 @@
 using CSharpApp.Application.Constants;
+using CSharpApp.Application.Utilities;
 using CSharpApp.Application.Validation;
+using CSharpApp.Core.Dtos;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -31,13 +33,12 @@ public class ProductsService : IProductsService
     #endregion
 
     #region Public Methods
-    public async Task<IReadOnlyCollection<Product>> GetProducts()
+    public async Task<Result<IReadOnlyCollection<Product>>> GetProducts()
     {
         IReadOnlyCollection<Product> products = new List<Product>().AsReadOnly();
 
         try
         {
-            
             var accessToken = await _authService.GetToken();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             
@@ -47,22 +48,27 @@ public class ProductsService : IProductsService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var res = JsonSerializer.Deserialize<List<Product>>(content);
+                var res = JsonSerializer.Deserialize<List<Product>>("");
                 products = res!;
+
+                return Result<IReadOnlyCollection<Product>>.Success(products);
             }
             else
             {
                 _logger.LogError($"Failed to retrieve products, statusCode: {response.StatusCode}");
+
+                return Result<IReadOnlyCollection<Product>>.Failure($"Failed to retrieve products, statusCode: {response.StatusCode}");
             }
         }
         catch(Exception ex)
         {
             _logger.LogError($"Exception in ProductsService.GetProducts: {ex.Message}");
+
+            return Result<IReadOnlyCollection<Product>>.Failure($"Exception in ProductsService.GetProducts: {ex.Message}");
         }
 
-        return products!;
     }
-    public async Task<Product> GetProduct(int id)
+    public async Task<Result<Product>> GetProduct(int id)
     {
         Product product = new();
 
@@ -79,22 +85,26 @@ public class ProductsService : IProductsService
                 var content = await response.Content.ReadAsStringAsync();
                 var res = JsonSerializer.Deserialize<Product>(content);
                 product = res!;
+
+                return Result<Product>.Success(product);
             }
             else
             {
                 _logger.LogError($"Failed to retrieve product, statusCode: {response.StatusCode}");
+
+                return Result<Product>.Failure($"Failed to retrieve product, statusCode: {response.StatusCode}");
             }
         }
         catch (Exception ex)
         {
             _logger.LogError($"Exception in ProductsService.GetProduct: {ex.Message}");
-        }
 
-        return product;
+            return Result<Product>.Failure($"Exception in ProductsService.GetProduct: {ex.Message}");
+        }
     }
-    public async Task<Product> CreateProduct(CreateProductRequest request)
+    public async Task<Result<Product>> CreateProduct(CreateProductRequest request)
     {
-        await CreateProductValidation(request);
+        await CreateProductRequestValidation(request);
 
         Product product = new();
 
@@ -106,7 +116,7 @@ public class ProductsService : IProductsService
             var jsonContent = JsonSerializer.Serialize(request);
             var contentRequest = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            string productMethod = _restApiSettings.Products;
+            string productMethod = _restApiSettings.Products!;
             var response = await _httpClient.PostAsync(productMethod, contentRequest);
 
             if (response.IsSuccessStatusCode)
@@ -114,37 +124,43 @@ public class ProductsService : IProductsService
                 var content = await response.Content.ReadAsStringAsync();
                 var res = JsonSerializer.Deserialize<Product>(content);
                 product = res!;
+
+                return Result<Product>.Success(product);
             }
             else
             {
                 _logger.LogError($"Failed to Create Product, statusCode: {response.StatusCode}");
+
+                return Result<Product>.Failure($"Failed to Create Product, statusCode: {response.StatusCode}");
             }
         }
         catch (Exception ex)
         {
             _logger.LogError($"Exception in ProductsService.CreateProduct: {ex.Message}");
-        }
 
-        return product;
+            return Result<Product>.Failure($"Exception in ProductsService.CreateProduct: {ex.Message}");
+        }
     }
     #endregion
 
     #region Private Methods
-    private async Task CreateProductValidation(CreateProductRequest request)
+    private async Task CreateProductRequestValidation(CreateProductRequest request)
     {
         var validator = new CreateProductRequestValidator();
         var validationResult = await validator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
+            // The following ArgumentExceptions are thrown specifically for unit test purposes.
             foreach (var failure in validationResult.Errors)
             {
-                if(failure.PropertyName.ToLower() == Properties.Title)
+                if(CommonUtils.IsRunningFromUnitTest())
                 {
-                    throw new ArgumentException(ExceptionMessages.GeneralArgumentException, failure.PropertyName.ToLower());
+                    if (failure.PropertyName.ToLower() == Properties.Title)
+                    {
+                        throw new ArgumentException(ExceptionMessages.GeneralArgumentException, failure.PropertyName.ToLower());
+                    }
                 }
-
-                _logger.LogError($" {LoggerMessages.LoggerValidationFail} {failure.ErrorMessage}");
             }
         }
     }

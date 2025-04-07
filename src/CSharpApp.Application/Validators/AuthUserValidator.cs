@@ -8,13 +8,12 @@ using CSharpApp.Application.Constants;
 
 namespace CSharpApp.Application.Validation
 {
-    public class LoginRequestValidator : AbstractValidator<User>
+    public class AuthUserValidator : AbstractValidator<AuthUser>
     {
-        public LoginRequestValidator()
+        public AuthUserValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage(ValidationMessages.UserNameRequired);
-                //.Length(10, 100).WithMessage(ValidationMessages.ProductTitleMustBeGreaterThan10);
 
             RuleFor(x => x.PassWord)
                  .NotEmpty().WithMessage(ValidationMessages.PassWordRequired);
