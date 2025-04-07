@@ -103,6 +103,21 @@ namespace CSharpApp.Api.Extensions
                 .HasApiVersion(1.0);
             #endregion
 
+            versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/Getproductsusingmediator", async (IProductsService productsService) =>
+            {
+                var products = await productsService.GetProductsUsingMediator();
+                if (products.IsSuccess)
+                {
+                    return Results.Ok(products.Data);
+                }
+                else
+                {
+                    return Results.StatusCode(products.StatusCode);
+                }
+            })
+           .WithName("GetProductsUsingMediator")
+           .HasApiVersion(1.0);
+
             return app;
         }
     }

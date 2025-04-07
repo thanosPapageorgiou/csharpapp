@@ -3,6 +3,8 @@ using CSharpApp.Application.Categories;
 using CSharpApp.Application.Products;
 using Polly.Extensions.Http;
 using Polly;
+using Microsoft.Extensions.DependencyInjection;
+using CSharpApp.Application;
 
 namespace CSharpApp.Api.Extensions
 {
@@ -28,6 +30,11 @@ namespace CSharpApp.Api.Extensions
             services.AddHttpContextAccessor();
 
             services.AddTransient<ITokenService, TokenService>();
+
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(MediatorEntryPoint).Assembly);
+            });
 
             return services;
         }

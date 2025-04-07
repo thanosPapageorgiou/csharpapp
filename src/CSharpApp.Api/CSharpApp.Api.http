@@ -2,34 +2,10 @@
 @Version = v1
 
 
-GET {{HostAddress}}/api/{{Version}}/getproduct
+
+GET {{HostAddress}}/api/{{Version}}/Getproductsusingmediator
 Accept: application/json
 
-# GET {{HostAddress}}/api/{{Version}}/getproduct/{{id}}
-# Accept: application/json
 
-# POST {{HostAddress}}/api/{{Version}}/createproduct
-# Content-Type: application/json
-# {
-#     "title": "New Product_3",
-#     "price": 10,
-#     "description": "A description",
-#     "categoryId": 1,
-#     "images": [
-#         "https://placeimg.com/640/480/any"
-#     ]
-# }
-
-# GET {{HostAddress}}/api/{{Version}}/getcategories
-# Accept: application/json
-
-
-
-# POST {{HostAddress}}/api/{{Version}}/createcategory
-# Content-Type: application/json
-# {
-#   "name": "Books1",
-#   "image": "https://api.lorem.space/image/book?w=150&h=220"
-# }
 
 ###

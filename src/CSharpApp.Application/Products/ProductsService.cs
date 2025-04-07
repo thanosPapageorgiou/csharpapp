@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using CSharpApp.Application.Products.Handlers;
+using CSharpApp.Application.Products.Queries;
 
 namespace CSharpApp.Application.Products;
 
@@ -19,16 +21,18 @@ public class ProductsService : IProductsService
     private readonly RestApiSettings _restApiSettings;
     private readonly ILogger<ProductsService> _logger;
     private readonly IAuthService _authService;
+    private readonly IMediator _mediator;
     
     #endregion
 
     #region Constructor
-    public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger, IAuthService authService)
+    public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger, IAuthService authService, IMediator mediator)
     {
         _httpClient = httpClient;
         _restApiSettings = restApiSettings.Value;
         _logger = logger;
         _authService = authService;
+        _mediator = mediator;
     }
     #endregion
 
@@ -48,7 +52,7 @@ public class ProductsService : IProductsService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var res = JsonSerializer.Deserialize<List<Product>>("");
+                var res = JsonSerializer.Deserialize<List<Product>>(content);
                 products = res!;
 
                 return Result<IReadOnlyCollection<Product>>.Success(products);
@@ -67,6 +71,11 @@ public class ProductsService : IProductsService
             return Result<IReadOnlyCollection<Product>>.Failure($"Exception in ProductsService.GetProducts: {ex.Message}");
         }
 
+    }
+    public async Task<Result<IReadOnlyCollection<Product>>> GetProductsUsingMediator()
+    {
+        var products = await _mediator.Send(new GetProductListQuery());
+        return Result<IReadOnlyCollection<Product>>.Success(products);
     }
     public async Task<Result<Product>> GetProduct(int id)
     {
