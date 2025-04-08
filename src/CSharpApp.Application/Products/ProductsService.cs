@@ -1,16 +1,8 @@
 using CSharpApp.Application.Constants;
 using CSharpApp.Application.Utilities;
 using CSharpApp.Application.Validation;
-using CSharpApp.Core.Dtos;
-using MediatR;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using CSharpApp.Application.Products.Handlers;
-using CSharpApp.Application.Products.Queries;
 
 namespace CSharpApp.Application.Products;
 

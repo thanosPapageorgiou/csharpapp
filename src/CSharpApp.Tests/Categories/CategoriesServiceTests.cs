@@ -1,5 +1,4 @@
 using CSharpApp.Application.Categories;
-using CSharpApp.Application.Products;
 using CSharpApp.Core.Dtos;
 using CSharpApp.Core.Interfaces;
 using CSharpApp.Core.Settings;
@@ -7,10 +6,7 @@ using CSharpApp.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Net;
-using System.Text;
 using System.Text.Json;
-using System.Xml.Linq;
 
 namespace CSharpApp.Tests.Categories
 {

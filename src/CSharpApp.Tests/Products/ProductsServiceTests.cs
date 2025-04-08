@@ -6,8 +6,6 @@ using CSharpApp.Tests.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Net;
-using System.Text;
 using System.Text.Json;
 
 namespace CSharpApp.Tests.Products

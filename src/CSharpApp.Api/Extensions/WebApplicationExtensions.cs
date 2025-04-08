@@ -197,9 +197,7 @@ namespace CSharpApp.Api.Extensions
             .HasApiVersion(1.0);
             #endregion
 
-
             return app;
-
         }
     }
 }
