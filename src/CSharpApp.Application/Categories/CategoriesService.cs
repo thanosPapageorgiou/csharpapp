@@ -98,7 +98,7 @@ public class CategoriesService : ICategoriesService
             return Result<Category>.Failure($"Exception in CategoriesService.GetCategory: {ex.Message}");
         }
     }
-    public async Task<Result<Category>> CreateCategory(CreateCategoryRequest request)
+    public async Task<Result<Category>> CreateCategory(CreateCategory request)
     {
         await CreateCategoryValidation(request);
 
@@ -141,9 +141,9 @@ public class CategoriesService : ICategoriesService
     #endregion
 
     #region Private Methods
-    private async Task CreateCategoryValidation(CreateCategoryRequest request)
+    private async Task CreateCategoryValidation(CreateCategory request)
     {
-        var validator = new CreateCategoryRequestValidator();
+        var validator = new CreateCategoryValidator();
         var validationResult = await validator.ValidateAsync(request);
 
         if (!validationResult.IsValid)

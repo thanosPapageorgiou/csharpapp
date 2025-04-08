@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace CSharpApp.Application.Products.Queries
 {
-    public record GetProductListQuery(): IRequest<Result<IReadOnlyCollection<Product>>>;
+    public record GetProductQuery(int ProductId): IRequest<Result<Product>>;
 }

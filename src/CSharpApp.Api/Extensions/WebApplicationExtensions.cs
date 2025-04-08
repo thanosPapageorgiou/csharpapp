@@ -39,7 +39,7 @@ namespace CSharpApp.Api.Extensions
                 .WithName("GetProduct")
                 .HasApiVersion(1.0);
 
-            versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createproduct", async (IProductsService productsService, CreateProductRequest request) =>
+            versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createproduct", async (IProductsService productsService, CreateProduct request) =>
             {
                 var newProduct = await productsService.CreateProduct(request);
                 if (newProduct.IsSuccess)
@@ -87,7 +87,7 @@ namespace CSharpApp.Api.Extensions
                 .WithName("GetCategory")
                 .HasApiVersion(1.0);
 
-            versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createcategory", async (ICategoriesService categoriesService, CreateCategoryRequest request) =>
+            versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createcategory", async (ICategoriesService categoriesService, CreateCategory request) =>
             {
                 var newCategory = await categoriesService.CreateCategory(request);
                 if (newCategory.IsSuccess)
@@ -103,9 +103,10 @@ namespace CSharpApp.Api.Extensions
                 .HasApiVersion(1.0);
             #endregion
 
-            versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/Getproductsusingmediator", async (IProductsService productsService) =>
+            #region Mediator Products Endpoints
+            versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getproductsusingmediator", async (IProductsMediatorService productsMediatorService) =>
             {
-                var products = await productsService.GetProductsUsingMediator();
+                var products = await productsMediatorService.GetProducts();
                 if (products.IsSuccess)
                 {
                     return Results.Ok(products.Data);
@@ -118,7 +119,87 @@ namespace CSharpApp.Api.Extensions
            .WithName("GetProductsUsingMediator")
            .HasApiVersion(1.0);
 
+            versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getproductusingmediator/{productId:int}", async (IProductsMediatorService productsMediatorService, int productId) =>
+            {
+                var product = await productsMediatorService.GetProduct(productId);
+                if (product.IsSuccess)
+                {
+                    return Results.Ok(product.Data);
+                }
+                else
+                {
+                    return Results.StatusCode(product.StatusCode);
+                }
+            })
+            .WithName("GetProductUsingMediator")
+            .HasApiVersion(1.0);
+
+            versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createproductusingmediator", async (IProductsMediatorService productsMediatorService, CreateProduct request) =>
+            {
+                var newProduct = await productsMediatorService.CreateProduct(request);
+                if (newProduct.IsSuccess)
+                {
+                    return Results.Ok(newProduct.Data);
+                }
+                else
+                {
+                    return Results.StatusCode(newProduct.StatusCode);
+                }
+            })
+            .WithName("CreateProductUsingMediator")
+            .HasApiVersion(1.0);
+            #endregion
+
+            #region Mediator Categories Endpoints
+            versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getcategoriesusingmediator", async (ICategoriesMediatorService categoriesMediatorService) =>
+            {
+                var categories = await categoriesMediatorService.GetCategories();
+                if (categories.IsSuccess)
+                {
+                    return Results.Ok(categories.Data);
+                }
+                else
+                {
+                    return Results.StatusCode(categories.StatusCode);
+                }
+            })
+           .WithName("GetCategoriesUsingMediator")
+           .HasApiVersion(1.0);
+
+            versionedEndpointRouteBuilder.MapGet("api/v{version:apiVersion}/getcategoryusingmediator/{categoryId:int}", async (ICategoriesMediatorService categoriesMediatorService, int categoryId) =>
+            {
+                var category = await categoriesMediatorService.GetCategory(categoryId);
+                if (category.IsSuccess)
+                {
+                    return Results.Ok(category.Data);
+                }
+                else
+                {
+                    return Results.StatusCode(category.StatusCode);
+                }
+            })
+            .WithName("GetCategoryUsingMediator")
+            .HasApiVersion(1.0);
+
+            versionedEndpointRouteBuilder.MapPost("api/v{version:apiVersion}/createcategoryusingmediator", async (ICategoriesMediatorService categoriesMediatorService, CreateCategory request) =>
+            {
+                var newCategory = await categoriesMediatorService.CreateCategory(request);
+                if (newCategory.IsSuccess)
+                {
+                    return Results.Ok(newCategory.Data);
+                }
+                else
+                {
+                    return Results.StatusCode(newCategory.StatusCode);
+                }
+            })
+            .WithName("CreateCategoryUsingMediator")
+            .HasApiVersion(1.0);
+            #endregion
+
+
             return app;
+
         }
     }
 }

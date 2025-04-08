@@ -21,18 +21,16 @@ public class ProductsService : IProductsService
     private readonly RestApiSettings _restApiSettings;
     private readonly ILogger<ProductsService> _logger;
     private readonly IAuthService _authService;
-    private readonly IMediator _mediator;
     
     #endregion
 
     #region Constructor
-    public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger, IAuthService authService, IMediator mediator)
+    public ProductsService(HttpClient httpClient, IOptions<RestApiSettings> restApiSettings, ILogger<ProductsService> logger, IAuthService authService)
     {
         _httpClient = httpClient;
         _restApiSettings = restApiSettings.Value;
         _logger = logger;
         _authService = authService;
-        _mediator = mediator;
     }
     #endregion
 
@@ -72,11 +70,6 @@ public class ProductsService : IProductsService
         }
 
     }
-    public async Task<Result<IReadOnlyCollection<Product>>> GetProductsUsingMediator()
-    {
-        var products = await _mediator.Send(new GetProductListQuery());
-        return Result<IReadOnlyCollection<Product>>.Success(products);
-    }
     public async Task<Result<Product>> GetProduct(int id)
     {
         Product product = new();
@@ -111,7 +104,7 @@ public class ProductsService : IProductsService
             return Result<Product>.Failure($"Exception in ProductsService.GetProduct: {ex.Message}");
         }
     }
-    public async Task<Result<Product>> CreateProduct(CreateProductRequest request)
+    public async Task<Result<Product>> CreateProduct(CreateProduct request)
     {
         await CreateProductRequestValidation(request);
 
@@ -153,9 +146,9 @@ public class ProductsService : IProductsService
     #endregion
 
     #region Private Methods
-    private async Task CreateProductRequestValidation(CreateProductRequest request)
+    private async Task CreateProductRequestValidation(CreateProduct request)
     {
-        var validator = new CreateProductRequestValidator();
+        var validator = new CreateProductValidator();
         var validationResult = await validator.ValidateAsync(request);
 
         if (!validationResult.IsValid)

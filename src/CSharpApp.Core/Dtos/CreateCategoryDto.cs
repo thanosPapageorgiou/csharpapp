@@ -1,6 +1,6 @@
 namespace CSharpApp.Core.Dtos;
 
-public sealed class CreateCategoryRequest
+public sealed class CreateCategory
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

@@ -8,9 +8,9 @@ using CSharpApp.Application.Constants;
 
 namespace CSharpApp.Application.Validation
 {
-    public class CreateProductRequestValidator : AbstractValidator<CreateProductRequest>
+    public class CreateProductValidator : AbstractValidator<CreateProduct>
     {
-        public CreateProductRequestValidator()
+        public CreateProductValidator()
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage(ValidationMessages.ProductTitleRequired)

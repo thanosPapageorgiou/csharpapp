@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CSharpApp.Core.Dtos;
 
-public sealed class CreateProductRequest
+public sealed class CreateProduct
 {
     [JsonPropertyName("title")]
     public string? Title { get; set; }

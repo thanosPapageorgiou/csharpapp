@@ -31,7 +31,6 @@ namespace CSharpApp.Tests.Products
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
             var authService = new Mock<IAuthService>();
-            //var cacheMock = new Mock<IDistributedCache>();
 
             var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
@@ -59,7 +58,6 @@ namespace CSharpApp.Tests.Products
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
             var authService = new Mock<IAuthService>();
-            //var cacheMock = new Mock<IDistributedCache>();
 
             var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
@@ -96,13 +94,11 @@ namespace CSharpApp.Tests.Products
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
             var authService = new Mock<IAuthService>();
-            //var cacheMock = new Mock<IDistributedCache>();
 
             var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
-
             //Act
-            var newProductRequest = new CreateProductRequest
+            var newProductRequest = new CreateProduct
             {
                 Title = title,
                 Price = price,
@@ -118,7 +114,7 @@ namespace CSharpApp.Tests.Products
         }
         #endregion
 
-        #region CreateProduct If Has Empty Title Parameter Should Throw ArgumentException
+        #region CreateProduct Empty Title Parameter Should Throw ArgumentException
         [Theory]
         [InlineData("test-title-prod-1", 10, "test-descr-prod-1", 1, "https://placeimg.com/640/480/any")]
         [InlineData("", 10, "test-descr-prod-2", 1, "https://placeimg.com/640/480/any")]
@@ -146,13 +142,11 @@ namespace CSharpApp.Tests.Products
             var settings = Options.Create(new RestApiSettings { Products = "products" });
             var logger = new LoggerFactory().CreateLogger<ProductsService>();
             var authService = new Mock<IAuthService>();
-            //var cacheMock = new Mock<IDistributedCache>();
 
             var service = new ProductsService(httpClient, settings, logger, authService.Object);
 
-
             //Act
-            var newProductRequest = new CreateProductRequest
+            var newProductRequest = new CreateProduct
             {
                 Title = title,
                 Price = price,

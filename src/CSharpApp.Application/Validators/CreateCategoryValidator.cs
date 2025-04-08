@@ -8,9 +8,9 @@ using CSharpApp.Application.Constants;
 
 namespace CSharpApp.Application.Validation
 {
-    public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRequest>
+    public class CreateCategoryValidator : AbstractValidator<CreateCategory>
     {
-        public CreateCategoryRequestValidator()
+        public CreateCategoryValidator()
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage(ValidationMessages.CategoryNameRequired)

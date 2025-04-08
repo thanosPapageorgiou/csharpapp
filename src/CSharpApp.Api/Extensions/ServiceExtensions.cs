@@ -30,6 +30,8 @@ namespace CSharpApp.Api.Extensions
             services.AddHttpContextAccessor();
 
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IProductsMediatorService, ProductsMediatorService>();
+            services.AddTransient<ICategoriesMediatorService, CategoriesMediatorService>();
 
             services.AddMediatR(cfg =>
             {

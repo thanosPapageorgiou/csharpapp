@@ -34,10 +34,7 @@ namespace CSharpApp.Tests.Categories
 
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
-            //var cacheMock = new Mock<IDistributedCache>();
             var authService = new Mock<IAuthService>();
-
-     
 
             var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
@@ -98,13 +95,11 @@ namespace CSharpApp.Tests.Categories
             var settings = Options.Create(new RestApiSettings { Products = "categories" });
             var logger = new LoggerFactory().CreateLogger<CategoriesService>();
             var authService = new Mock<IAuthService>();
-            //var cacheMock = new Mock<IDistributedCache>();
 
             var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
-
             //Act
-            var newCategoryRequest = new CreateCategoryRequest
+            var newCategoryRequest = new CreateCategory
             {
                 Name = name,
                 Image = image 
@@ -117,7 +112,7 @@ namespace CSharpApp.Tests.Categories
         }
         #endregion
 
-        #region CreateCategory If Has Empty -Name OR Image- Parameter Should Throw ArgumentException
+        #region CreateCategory If Has Empty [Name OR Image] Should Throw ArgumentException
         [Theory]
         [InlineData("", "https://placeimg.com/640/480/any")]
         [InlineData("test-title-category-2", "")]
@@ -143,9 +138,8 @@ namespace CSharpApp.Tests.Categories
 
             var service = new CategoriesService(httpClient, settings, logger, authService.Object);
 
-
             //Act
-            var newCategoryRequest = new CreateCategoryRequest
+            var newCategoryRequest = new CreateCategory
             {
                 Name = name,
                 Image = image

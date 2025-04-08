@@ -2,9 +2,15 @@
 @Version = v1
 
 
+POST {{HostAddress}}/api/{{Version}}/createcategoryusingmediator
+Content-Type: application/json
+{
+  "name": "Books_med_1",
+  "image": "https://api.lorem.space/image/book?w=150&h=220"
+}
 
-GET {{HostAddress}}/api/{{Version}}/Getproductsusingmediator
-Accept: application/json
+
+
 
 
 

@@ -1,8 +1,8 @@
 namespace CSharpApp.Core.Interfaces;
 
-public interface ICategoriesService
+public interface ICategoriesMediatorService
 {
     Task<Result<IReadOnlyCollection<Category>>> GetCategories();
-    Task<Result<Category>> GetCategory(int id);
+    Task<Result<Category>> GetCategory(int categoryId);
     Task<Result<Category>> CreateCategory(CreateCategory request);
 }
