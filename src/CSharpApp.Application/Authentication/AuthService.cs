@@ -33,39 +33,41 @@ public class AuthService : IAuthService
     {
         string accessToken = string.Empty;
 
-        string _AccessTokenCache = _tokenService.GetAccessToken();
+        string _accessTokenCache = _tokenService.GetAccessToken();
 
-        if (!string.IsNullOrEmpty(_AccessTokenCache))
+        if (!string.IsNullOrEmpty(_accessTokenCache))
         {
-            bool tokenExpired = await IsTokenExpired(_AccessTokenCache);
+            bool tokenExpired = await IsTokenExpired(_accessTokenCache);
             if(!tokenExpired)
             {
-                accessToken = _AccessTokenCache;
+                accessToken = _accessTokenCache;
             }
             else
             {
-                string _RefreshTokenCache = _tokenService.GetRefreshToken();
-                if (!string.IsNullOrEmpty(_RefreshTokenCache))
+                string _refreshTokenCache = _tokenService.GetRefreshToken();
+                if (!string.IsNullOrEmpty(_refreshTokenCache))
                 {
-                    AuthTokens tokens = await RefreshExistingToken(_RefreshTokenCache!);
+                    AuthTokens tokens = await RefreshExistingToken(_refreshTokenCache!);
                     if (!string.IsNullOrEmpty(tokens.AccessToken))
                     {
                         accessToken = tokens.AccessToken;
 
                         _tokenService.StoreToken(tokens.AccessToken, tokens.RefreshToken!);
                     }
+                    else
+                    {
+                        accessToken = await GenerateTokenAndStore();
+                    }
+                }
+                else
+                {
+                    accessToken = await GenerateTokenAndStore();
                 }
             }
         }
         else
         {
-            AuthTokens tokens = await GenerateToken();
-            if (!string.IsNullOrEmpty(tokens.AccessToken))
-            {
-                accessToken = tokens.AccessToken;
-
-                _tokenService.StoreToken(tokens.AccessToken, tokens.RefreshToken!);
-            }
+            accessToken = await GenerateTokenAndStore();
         }
         return accessToken;
     }
@@ -74,7 +76,7 @@ public class AuthService : IAuthService
     #region Private Methods
     private async Task<AuthTokens> GenerateToken()
     {
-        AuthTokens Tokens = new();
+        AuthTokens tokens = new();
 
         try
         {
@@ -94,7 +96,7 @@ public class AuthService : IAuthService
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var res = JsonSerializer.Deserialize<AuthTokens>(content);
-                Tokens = res!;
+                tokens = res!;
             }
             else
             {
@@ -107,7 +109,7 @@ public class AuthService : IAuthService
             _logger.LogError($"Exception in AuthService.GenerateToken: {ex.Message}");
         }
 
-        return Tokens!;
+        return tokens!;
     }
     private async Task<bool> IsTokenExpired(string token)
     {
@@ -150,6 +152,19 @@ public class AuthService : IAuthService
         // Send the refreshToken form Session to the authorization server, returns a new accessToken.
 
         return tokens!;
+    }
+    private async Task<string> GenerateTokenAndStore()
+    {
+        string accessToken = string.Empty;
+        AuthTokens tokens = await GenerateToken();
+        if (!string.IsNullOrEmpty(tokens.AccessToken))
+        {
+            accessToken = tokens.AccessToken;
+
+            _tokenService.StoreToken(tokens.AccessToken, tokens.RefreshToken!);
+        }
+
+        return accessToken;
     }
     #endregion
 }

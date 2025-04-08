@@ -12,19 +12,26 @@ namespace CSharpApp.Api.Middlewares
             _next = next;
             _logger = logger;
         }
-
         public async Task InvokeAsync(HttpContext context)
         {
-            var watch = Stopwatch.StartNew();
+            try
+            {
+                var watch = Stopwatch.StartNew();
 
-            await _next(context);
+                await _next(context);
 
-            watch.Stop();
+                watch.Stop();
 
-            var elapsedMs = watch.ElapsedMilliseconds;
-            var requestPath = context.Request.Path;
+                var elapsedMs = watch.ElapsedMilliseconds;
+                var requestPath = context.Request.Path;
 
-            _logger.LogInformation("Request [{RequestPath}] executed in {ElapsedMilliseconds}ms", requestPath, elapsedMs);
+                _logger.LogInformation("Request [{RequestPath}] executed in {ElapsedMilliseconds}ms", requestPath, elapsedMs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception in PerformanceMiddleware.InvokeAsync: {ex.Message}");
+            }
+            
         }
     }
 }
